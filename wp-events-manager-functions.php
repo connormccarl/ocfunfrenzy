@@ -1,3 +1,4 @@
+-- ORIGINAL --
 $date_search[] = array(
 	'key'     => '_event_start_date',
 	'value'   =>  $dates['end'],
