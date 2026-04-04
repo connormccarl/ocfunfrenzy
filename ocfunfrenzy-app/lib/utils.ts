@@ -8,4 +8,4 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // mysql connection details
-export const db = postgres(process.env.POSGRES_URL!, { ssl: 'require' });
+export const db = postgres(process.env.DATABASE_URL!, { ssl: 'require' });

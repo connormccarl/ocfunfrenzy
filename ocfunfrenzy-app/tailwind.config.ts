@@ -10,5 +10,4 @@ module.exports = {
     plugins: [
         require('tailwindcss-animate'),
     ],
-    preflight: false,
 }

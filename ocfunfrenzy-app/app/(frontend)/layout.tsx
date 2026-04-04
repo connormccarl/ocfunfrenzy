@@ -2,7 +2,7 @@ import './globals.css';
 import '@mantine/core/styles.css';
 
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { theme } from '../theme';
+import { theme } from './theme';
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: any }) {
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
-        <ColorSchemeScript />
+        {/*<ColorSchemeScript />*/}
         <link rel="shortcut icon" href="/favicon.png" />
         <meta
           name="viewport"
