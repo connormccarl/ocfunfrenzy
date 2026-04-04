@@ -46,7 +46,6 @@ export default function EventsGrid() {
                     classNames={{ 
                         root: '!w-full',
                         input: '!border !border-gray-400 !rounded !p-2 !text-md !h-12',
-                        inner: '!text-lg',
                         placeholder: '!text-md font-normal',
                         presetsList: '',
                     }}
