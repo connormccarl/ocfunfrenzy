@@ -1,0 +1,64 @@
+Save all work in: [C:\Users\conno\code\ocfunfrenzy\data\20260404]. Create a master excel document combining all separate excel documents in the subdirectory: [Raw].
+
+The final excel document should have the following tabs: events, events_categories, events_types. Each separate excel document should have the same header and columns. For the ones that have different headers, give me a list at the end.
+
+Add to more tabs to be references in the preceding tabs below. One named categories, populated with ids and names of the following eventCategories array of string names. The second one types, populated with ids and names of the following eventTypes array of string names.
+
+const eventCategories = [
+    'Date Night',
+    'Family Fun',
+    'Flying Solo',
+    'Group Galivanting',
+];
+
+const eventTypes = [
+    'Amusement Parks',
+    'Animals & Aquariums',
+    'Beaches',
+    'Caves',
+    'Chair Champs',
+    'Fairs & Festivals',
+    'Food Halls / Court',
+    'Free is for Me!',
+    'Girls at Night',
+    'Hikes',
+    'Lakes',
+    'Move Your Body',
+    'Museums',
+    'Museums - Art',
+    'Nature Centers',
+    'Parks with Perks',
+    'Race & Endurance Events',
+    'Rainy Day (Indoor activities)',
+    'Rentals',
+    'Scavenger Hunts',
+    'Splash Pads',
+    'Tours',
+    'Unique Food Experiences',
+    'Volunteering (with no obligation)',
+    'Wild & Wacky',
+    'Zen Out',
+];
+
+
+Please map each separate excel document header column to the final master excel tabs following the instructions listed below; each column is on a new line. For example, [Master Column Name]>[Tab].[Column Name]=[information on the column and instructions on how to process the data]. [_] signifies a new column that does not exist in the original separate excel documents. A ">[x]" signifies do not copy the data from the original separate excel documents.
+
+
+[_]>[events].[id]=[primary key and unique identifier for the events table]
+[Event]>[x]
+[Title]>[events].[title]=[plain text copy]
+[Top Box]>[events].[content]=[plain text copy]
+[Meta Description (160 max words)]>[events].[excerpt]=[plain text copy]
+[Cell count]>[x]
+[Focus Keyphrase]>[events].[seo_keyphrase]=[plain text copy]
+[Zip code]>[events].[zip_code]=[plain text copy]
+[Event location]>[events].[location]=[plain text copy]
+[Banner name (in folder, to upload)]>[x]
+[Registration email/URL]>[events].[registration_info]=[plain text copy]
+[Start date]>[events].[start_date]=[plain text copy, any "'#REF!" keep blank]
+[End date]>[events].[end_date]=[plain text copy, any "'#REF!" keep blank]
+[Event category]>[events_categories].[name]=[split the delimited data on a comma, and save each value as an individual row in the events_categories tab and table referencing the event_id primary key created for the current event and then the category_id for the most closely matched name value in the categories tab and table for each category record]
+[Event type]>[events_types].[name]=[split the delimited data on a comma, and save each value as an individual row in the types_categories tab and table referencing the event_id primary key created for the current event and then the id for the most closely matched name value in the categories tab and table for each type record]
+[Event thumbnail]>[events].[image]=[take the plain text, make all lowercase and replace spaces with a hyphen, set this as the name. search the subdirectory "Images" for the name.extension, where the .extension are image extensions. if found, save the name of the file found in the "Images" directory. if not found, use your best guess to find the matching file in the directory. if you still can't find one, save the original text in the next column such that it is events.image_original.]
+[Event category (only 1)]>[x]
+[Event type]>[x]

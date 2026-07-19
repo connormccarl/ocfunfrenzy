@@ -6,14 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model categories {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String              @unique @db.VarChar(64)
-  created_at        DateTime            @default(now()) @db.Timestamp(6)
-  updated_at        DateTime            @default(now()) @db.Timestamp(6)
-  events_categories events_categories[]
-}
-
 model events {
   id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title             String              @db.VarChar(128)
@@ -25,7 +17,7 @@ model events {
   registration_info String              @db.VarChar(512)
   start_date        DateTime?           @db.Timestamp(6)
   end_date          DateTime?           @db.Timestamp(6)
-  image             String?              @db.VarChar(512)
+  image             String              @db.VarChar(512)
   created_at        DateTime            @default(now()) @db.Timestamp(6)
   updated_at        DateTime            @default(now()) @db.Timestamp(6)
   events_categories events_categories[]
@@ -42,14 +34,22 @@ model events_categories {
   @@id([event_id, category_id])
 }
 
+model categories {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String              @unique @db.VarChar(64)
+  created_at        DateTime            @default(now()) @db.Timestamp(6)
+  updated_at        DateTime            @default(now()) @db.Timestamp(6)
+  events_categories events_categories[]
+}
+
 model events_types {
   event_id   String   @db.Uuid
-  id    String   @db.Uuid
+  type_id    String   @db.Uuid
   created_at DateTime @default(now()) @db.Timestamp(6)
   events     events   @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  types      types    @relation(fields: [id], references: [id], onUpdate: NoAction)
+  types      types    @relation(fields: [type_id], references: [id], onUpdate: NoAction)
 
-  @@id([event_id, id])
+  @@id([event_id, type_id])
 }
 
 model types {

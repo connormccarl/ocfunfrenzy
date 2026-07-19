@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation'
 
-import { isDate } from '@connormccarl/nextos/lib'
+import { isDate } from '@connormccarl/nextos/utils'
 import { Pagination, DateRange, SearchDateRange, SearchInput, SearchSelect } from '@connormccarl/nextos/ui';
 
 // data
 import { Search_Options, Search_Event, Page_Events, Event } from '@/prisma'
-import { getEvents, getSearchOptions } from '@/services'
+import { getEvents, getSearchOptions } from '@/prisma'
 
 import EventCard from './EventCard';
 
@@ -153,6 +153,7 @@ export default function EventsGrid() {
                 </div>
             )}
             <Pagination
+                isLoading={isLoading}
                 page={data.page}
                 totalPages={data.totalPages}
                 total={data.total}
@@ -164,13 +165,14 @@ export default function EventsGrid() {
             <div className="grid grid-cols-1 gap-4">
                 {isLoading ? (
                     <div className="col-span-full py-6 text-center text-gray-500">Loading events...</div>
-                ) : data.events.length === 0 ? (
+                ) : (!data.events || data.events.length === 0) ? (
                     <div className="col-span-full py-6 text-center text-gray-500">No events found</div>
                 ) : (
-                    data.events.map((event) => <div key={event.id}>Event {event.id}</div>)
+                    data.events.map((event) => <EventCard key={event.id} event={event} />)
                 )}
             </div>
             <Pagination
+                isLoading={isLoading}
                 page={data.page}
                 totalPages={data.totalPages}
                 total={data.total}

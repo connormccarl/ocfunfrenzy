@@ -1,23 +1,9 @@
 import Link from 'next/link';
-
 import { Event } from '@/prisma'
+import { formatDate } from '@connormccarl/nextos/utils'
 
-function formatEventDate(startDate: string | null, endDate: string | null) {
-    if (!startDate || !endDate) {
-        return '24/7';
-    }
-
-    const formatter = new Intl.DateTimeFormat('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-    });
-
-    return `${formatter.format(new Date(`${startDate}T00:00:00`))} - ${formatter.format(new Date(`${endDate}T00:00:00`))}`;
-}
-
-function TaxonomyBadges({ label, labels }: { label: string; labels: string[] }) {
-    if (labels.length === 0) {
+function TaxonomyBadges({ label, labels }: { label: string; labels: string[] | undefined }) {
+    if (!labels || labels.length === 0) {
         return null;
     }
 
@@ -35,14 +21,14 @@ function TaxonomyBadges({ label, labels }: { label: string; labels: string[] }) 
     );
 }
 
-function EventImageLink({ event, mobileOnly = false }: EventCardProps & { mobileOnly?: boolean }) {
+function EventImageLink({event, mobileOnly = false }: { event: Event; mobileOnly?: boolean }) {
     if (!event.image) {
         return null;
     }
 
     return (
         <Link
-            href={`/events/${event.id}`}
+            href={`/event/${event.id}`}
             className={`${mobileOnly ? 'block sm:hidden' : 'hidden sm:block sm:w-48 md:w-56'} overflow-hidden rounded-md border border-gray-200 bg-gray-50`}
         >
             <img
@@ -54,8 +40,8 @@ function EventImageLink({ event, mobileOnly = false }: EventCardProps & { mobile
     );
 }
 
-export default function EventCard({ event }: EventCardProps) {
-    const dateLabel = formatEventDate(event.startDate, event.endDate);
+export default function EventCard({event}: { event: Event }) {
+    const dateLabel = formatDate(event.start_date, event.end_date);
 
     return (
         <article className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
@@ -64,7 +50,7 @@ export default function EventCard({ event }: EventCardProps) {
                     <div className="flex flex-col gap-1">
                         <div className="text-sm font-medium text-gray-500">{dateLabel}</div>
                         <h3 className="text-xl font-semibold text-gray-900">
-                            <Link href={`/events/${event.id}`} className="hover:text-gray-600">
+                            <Link href={`/event/${event.id}`} className="hover:text-gray-600">
                                 {event.title}
                             </Link>
                         </h3>
@@ -75,7 +61,7 @@ export default function EventCard({ event }: EventCardProps) {
                     {event.location && (
                         <div className="text-sm text-gray-600">
                             {event.location}
-                            {event.zipCode ? ` ${event.zipCode}` : ''}
+                            {event.zip_code ? ` ${event.zip_code}` : ''}
                         </div>
                     )}
 
@@ -86,12 +72,12 @@ export default function EventCard({ event }: EventCardProps) {
                     )}
 
                     <div className="space-y-3">
-                        <TaxonomyBadges label="Categories" labels={event.categories.map((category) => category.name)} />
-                        <TaxonomyBadges label="Types" labels={event.types.map((type) => type.name)} />
+                        <TaxonomyBadges label="Categories" labels={event.categories?.map((category) => category)} />
+                        <TaxonomyBadges label="Types" labels={event.types?.map((type) => type)} />
                     </div>
 
                     <Link
-                        href={`/events/${event.id}`}
+                        href={`/event/${event.id}`}
                         className="mt-auto inline-flex w-full justify-center rounded-md bg-[#f1a236] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d98b22] sm:w-fit"
                     >
                         Click to see event details

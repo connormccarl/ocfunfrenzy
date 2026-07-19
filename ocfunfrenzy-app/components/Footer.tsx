@@ -42,7 +42,7 @@ export default function Footer() {
                     <div className="uppercase mb-3">Sign Up for Alerts</div>
                     <div className="mb-3">New adventures added weekly.</div>
                     <form className="group text-right">
-                        <input type="email" name="email" required className="px-3 py-2 border-1 rounded-md w-full mb-3" />
+                        <input type="email" name="email" required className="px-3 py-2 border rounded-md w-full mb-3" />
                         <button type="submit" className="p-2 bg-[#f1a236] w-36 rounded-md group-invalid:opacity-30 group-invalid:pointer-events-none">
                             Subscribe
                         </button>
