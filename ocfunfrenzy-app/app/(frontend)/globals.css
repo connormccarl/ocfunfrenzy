@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@source "../../node_modules/@connormccarl/nextos";
+
+@theme {
+  --font-display: var(--font-inter), Arial, Helvetica, sans-serif;
+}

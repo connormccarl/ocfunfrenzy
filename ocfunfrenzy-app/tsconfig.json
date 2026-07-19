@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["node", "jest", "@testing-library/jest-dom"],
+    "types": ["node"],
     "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -15,8 +15,9 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "preserveSymlinks": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
     },
     "plugins": [
       {
@@ -31,7 +32,8 @@
     ".storybook/preview.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "environment.d.ts"
   ],
   "exclude": ["node_modules"]
 }

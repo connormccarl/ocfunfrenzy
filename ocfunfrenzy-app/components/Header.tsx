@@ -32,7 +32,7 @@ export default function Header() {
                 <Image src="/logo_horizontal.png" alt="OC Fun Frenzy Logo" width={600} height={250} className="h-20 w-auto" />
                 <nav className="flex items-center space-x-8">
                     {menu.map((item) => (
-                        <Link key={item.href} href={item.href} className="text-lg font-medium">
+                        <Link key={item.href} href={item.href} className="text-lg font-normal">
                             {item.name}
                         </Link>
                     ))}
@@ -54,7 +54,7 @@ export default function Header() {
                         </div>
                         <DisclosurePanel className="flex flex-col space-y-4 items-center py-4">
                             {menu.map((item) => (
-                                <CloseButton as={Link} key={item.href} href={item.href} className="text-lg font-medium">
+                                <CloseButton as={Link} key={item.href} href={item.href} className="text-lg font-normal">
                                     {item.name}
                                 </CloseButton>
                             ))}
