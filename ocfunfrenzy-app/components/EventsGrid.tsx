@@ -1,165 +1,181 @@
 'use client'
-import dayjs from 'dayjs';
-import { useState, useEffect } from 'react';
 
-import { DatePickerInput } from '@mantine/dates';
-import { Select } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation'
 
-import '@mantine/dates/styles.css';
+import { isDate } from '@connormccarl/nextos/lib'
+import { Pagination, DateRange, SearchDateRange, SearchInput, SearchSelect } from '@connormccarl/nextos/ui';
+
+// data
+import { Search_Options, Search_Event, Page_Events, Event } from '@/prisma'
+import { getEvents, getSearchOptions } from '@/services'
+
+import EventCard from './EventCard';
+
+const clearObject = (object: Object) => {
+    return Object.fromEntries(Object.entries(object).map(([key, value]) => {
+        if(value.type === "string"){
+            return [key, ""];
+        } else if (value.type === "number"){
+            if(key === "page")
+                return [key, 1];
+            else if(key == "pageSize")
+                return [key, 10]
+            return [key, 1]; // fields: totalPages
+        } else {
+            return [key, []];
+        }
+    }));
+}
+
+const emptySearchOptions: Search_Options = {
+    categories: [],
+    types: []
+};
+
+const emptySearch: Search_Event = {
+    keywords: "",
+    location: "",
+    start_date: undefined,
+    end_date: undefined,
+    category: "",
+    type: "",
+    page: 1,
+    pageSize: 10
+};
+
+const emptyData: Page_Events = {
+    events: [],
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 1,
+};
 
 export default function EventsGrid() {
-    const [value, setValue] = useState<[string | null, string | null]>([null, null]);
-    const [events, setEvents] = useState([]);
+    const searchParams = useSearchParams();
+    const [searchOptions, setSearchOptions] = useState<Search_Options>(emptySearchOptions);
+    const [search, setSearch] = useState<Search_Event>(emptySearch);
+    const [data, setData] = useState<Page_Events>(emptyData);
 
-    // get events from database
-    const fetchEvents = async () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    // initial page load
+    useEffect(() => {
+        getInitialData();
+    }, []);
+
+    // pull not changing page data like search options
+    const getInitialData = async () => {
+        setSearchOptions(await getSearchOptions());
+    }
+    
+    // refresh the data everytime the search changes
+    useEffect(() => {
+        getData();
+    }, [search]);
+
+    // pull the data from the database
+    const getData = async () => {
+        // get Data
+        setIsLoading(true);
+        setErrorMessage("");
+
+        // load searchParams
+        Object.entries(searchParams).forEach(([key, value]) => {
+            // if it's a date 
+            if(isDate(value))
+                setSearch(prev => ({ ...prev, [key]: new Date(value) }));
+            setSearch(prev => ({ ...prev, [key]: value }));
+        });
+
+        // run service
         try {
-            const response = await fetch('/api/data');
-            const data = await response.json();
-            
-            setEvents(data);
+            const data = await getEvents(search);
+            setData(data);
         } catch (error) {
-            console.error('Error fetching events: ', error);
+            console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // run on page load
-    useEffect(() => {
-        fetchEvents();
-        console.log(events);
-    }, []);
-
     return (
-        <div className="mt-5 space-y-4">
-            {/* SEARCH */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 justify-between gap-2 mb-5">
-                <input type="text" placeholder="Keywords" className="border border-gray-400 rounded p-2 w-full placeholder-gray-400 text-md h-12" />
-                
-                <input type="text" placeholder="Location" className="border border-gray-400 rounded p-2 w-full placeholder-gray-400 text-md h-12" />
-
-                <DatePickerInput
-                    clearable
-                    type="range"
-                    placeholder="Select Date Range"
-                    value={value}
-                    onChange={setValue}
-                    classNames={{ 
-                        root: '!w-full',
-                        input: '!border !border-gray-400 !rounded !p-2 !text-md !h-12',
-                        placeholder: '!text-md font-normal',
-                        presetsList: '',
+        <div className="mt-5 space-y-2">
+            <div className="grid grid-cols-1 justify-between gap-2 sm:grid-cols-3">
+                <SearchInput 
+                    placeholder='Keywords'
+                    value={search.keywords}
+                    onChange={(event) => {
+                        setSearch(prev => ({ ...prev, keywords: event.target.value, page: 1 }));
                     }}
-                    presets={[
-                        { value: [dayjs().subtract(1, 'day').format('YYYY-MM-DD'), dayjs().subtract(1, 'day').format('YYYY-MM-DD')], label: 'Yesterday' },
-                        { value: [dayjs().format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')], label: 'Today' },
-                        { value: [dayjs().add(1, 'day').format('YYYY-MM-DD'), dayjs().add(1, 'day').format('YYYY-MM-DD')], label: 'Tomorrow' },
-                        { value: [dayjs().format('YYYY-MM-DD'), dayjs().add(1, 'month').format('YYYY-MM-DD')], label: 'Next month' },
-                        { value: [dayjs().format('YYYY-MM-DD'), dayjs().add(1, 'year').format('YYYY-MM-DD')], label: 'Next year' },
-                        { value: [dayjs().format('YYYY-MM-DD'), dayjs().subtract(1, 'month').format('YYYY-MM-DD')], label: 'Last month' },
-                        { value: [dayjs().format('YYYY-MM-DD'), dayjs().subtract(1, 'year').format('YYYY-MM-DD')], label: 'Last year' },
-                    ]}
+                />
+                <SearchInput
+                    placeholder='Location'
+                    value={search.location}
+                    onChange={(event) => {
+                        setSearch(prev => ({ ...prev, location: event.target.value, page: 1 }));
+                    }}
+                />
+                <SearchDateRange
+                    value={{
+                        start: search.start_date,
+                        end: search.end_date
+                    }}
+                    onChange={(value) => {
+                        setSearch(prev => ({ ...prev, start_date: value.start, end_date: value.end, page: 1 }));
+                    }}
                 />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 justify-between gap-2">
-                <Select
-                    placeholder="Choose an Event Category"
-                    data={[
-                        'Date Night', 
-                        'Family Fun', 
-                        'Flying Solo', 
-                        'Group Galivanting'
-                    ]}
-                    classNames={{
-                        input: "border !border-gray-400 rounded p-2 w-full placeholder-gray-400 text-md !h-12",
+            <div className="grid grid-cols-1 justify-between gap-2 sm:grid-cols-2">
+                <SearchSelect
+                    placeholder='Choose an Event Category'
+                    options={searchOptions.categories}
+                    value={search.category}
+                    onChange={(event) => {
+                        setSearch(prev => ({ ...prev, category: event.target.value, page: 1 }));
                     }}
-                    clearable
-                    allowDeselect
                 />
-
-                <Select
-                    placeholder="Choose an Event Type"
-                    data={[
-                        'Amusement Parks', 
-                        'Animals & Aquariums', 
-                        'Beaches', 
-                        'Caves',
-                        'Chair Champs',
-                        'Fairs & Festivals',
-                        'Food Halls / Court',
-                        'Free is for Me!',
-                        'Girls at Night',
-                        'Hikes',
-                        'Lakes',
-                        'Move Your Body',
-                        'Museums',
-                        'Museums - Art',
-                        'Nature Centers',
-                        'Parks with Perks',
-                        'Race & Endurance Events',
-                        'Rainy Day (Indoor activities',
-                        'Rentals',
-                        'Scavenger Hunts',
-                        'Splash Pads',
-                        'Tours',
-                        'Unique Food Experiences',
-                        'Volunteering (with no obligation)',
-                        'Wild & Wacky',
-                        'Zen Out',
-                    ]}
-                    classNames={{
-                        input: "border !border-gray-400 rounded p-2 w-full placeholder-gray-400 text-md !h-12",
+                <SearchSelect
+                    placeholder='Choose an Event Type'
+                    options={searchOptions.types}
+                    value={search.type}
+                    onChange={(event) => {
+                        setSearch(prev => ({ ...prev, type: event.target.value, page: 1 }));
                     }}
-                    clearable
-                    allowDeselect
                 />
             </div>
 
-            { events.length > 0 ?/* EVENTS */
-            events.map((event: any) => (
-                <article key={event.id} className="flex flex-col items-start justify-between sm:w-1/3">
-                    <div className="relative w-full">
-                        <img
-                        alt=""
-                        src=''
-                        className="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2 dark:bg-gray-800"
-                        />
-                        <div className="absolute inset-0 rounded-2xl inset-ring inset-ring-gray-900/10 dark:inset-ring-white/10" />
-                    </div>
-                    <div className="flex max-w-xl grow flex-col justify-between">
-                        <div className="mt-2 flex items-center gap-x-4 text-xs">
-                            <time dateTime={event.start_date} className="text-gray-500 dark:text-gray-400">
-                                {new Date(event.start_date).toLocaleDateString('en-US',{
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                })} - {new Date(event.end_date).toLocaleDateString('en-US',{
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                })}
-                            </time>
-                            <a
-                                href='#'
-                                className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800"
-                            >
-                                {event.status}
-                            </a>
-                        </div>
-                        <div className="group relative grow">
-                            <h3 className="mt-2 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600 dark:text-white dark:group-hover:text-gray-300">
-                                <a href='#'>
-                                    <span className="absolute inset-0" />
-                                    {event.title}
-                                </a>
-                            </h3>
-                            <p className="mt-3 line-clamp-3 text-sm/6 text-gray-600 dark:text-gray-400">{event.excerpt}</p>
-                        </div>
-                    </div>
-                </article>
-            ))
-            :
-            <div className='mt-4 text-center'>No events found</div>
-            }
+            {errorMessage && (
+                <div className="rounded-md border border-red-500 p-3 text-sm text-red-500">
+                    {errorMessage}
+                </div>
+            )}
+            <Pagination
+                page={data.page}
+                totalPages={data.totalPages}
+                total={data.total}
+                onPageChange={(event) => 
+                    setSearch(prev => ({ ...prev, page: event }))
+                }
+                top={true}
+            />
+            <div className="grid grid-cols-1 gap-4">
+                {isLoading ? (
+                    <div className="col-span-full py-6 text-center text-gray-500">Loading events...</div>
+                ) : data.events.length === 0 ? (
+                    <div className="col-span-full py-6 text-center text-gray-500">No events found</div>
+                ) : (
+                    data.events.map((event) => <div key={event.id}>Event {event.id}</div>)
+                )}
+            </div>
+            <Pagination
+                page={data.page}
+                totalPages={data.totalPages}
+                total={data.total}
+                onPageChange={(event) => setSearch(prev => ({ ...prev, page: event }))}
+            />
         </div>
-    )
+    );
 }

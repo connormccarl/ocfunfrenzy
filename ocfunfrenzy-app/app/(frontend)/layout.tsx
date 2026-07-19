@@ -1,8 +1,11 @@
 import './globals.css';
-import '@mantine/core/styles.css';
+import { Inter } from 'next/font/google';
 
-import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { theme } from './theme';
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap', 
+});
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,9 +17,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang="en" className={inter.variable}>
       <head>
-        {/*<ColorSchemeScript />*/}
         <link rel="shortcut icon" href="/favicon.png" />
         <meta
           name="viewport"
@@ -24,15 +26,13 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>
-          <div className="max-w-5xl mx-auto p-4">    
-            <Header />
-            <main className="mt-20 mb-30 sm:mb-50">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </MantineProvider>
+        <div className="max-w-5xl w-full mx-auto p-4">    
+          <Header />
+          <main className="mt-20 mb-20">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

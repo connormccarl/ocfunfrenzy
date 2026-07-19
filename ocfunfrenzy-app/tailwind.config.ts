@@ -1,13 +1,12 @@
-const plugin = require('tailwindcss/plugin');
-
-module.exports = {
+const config = {
     content: [
         "./app/**/*.{js,ts,jsx,tsx}",
+        "./components/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
         extend: {},
     },
-    plugins: [
-        require('tailwindcss-animate'),
-    ],
+    plugins: [],
 }
+
+export default config;

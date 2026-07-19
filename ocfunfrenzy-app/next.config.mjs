@@ -1,17 +1,19 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
-import { withPayload } from '@payloadcms/next/withPayload'
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-});
+const appRoot = path.dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = path.dirname(appRoot);
 
 const nextConfig = {
-  // Your Next.js config here
   reactStrictMode: false,
+  transpilePackages: ['@connormccarl/nextos'],
   experimental: {
-    optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
-  }
+    externalDir: true,
+  },
+  turbopack: {
+    root: workspaceRoot,
+  },
 };
 
-export default withBundleAnalyzer(withPayload(nextConfig));
+export default nextConfig;
 

@@ -41,7 +41,7 @@ export default function Footer() {
                 <div>
                     <div className="uppercase mb-3">Sign Up for Alerts</div>
                     <div className="mb-3">New adventures added weekly.</div>
-                    <form className="group">
+                    <form className="group text-right">
                         <input type="email" name="email" required className="px-3 py-2 border-1 rounded-md w-full mb-3" />
                         <button type="submit" className="p-2 bg-[#f1a236] w-36 rounded-md group-invalid:opacity-30 group-invalid:pointer-events-none">
                             Subscribe
@@ -50,7 +50,7 @@ export default function Footer() {
                 </div>
             </div>
             <div className="text-center py-4 text-sm">
-                 &copy; {new Date().getFullYear()} &middot; OC Fun Frenzy &middot; All rights reserved
+                 OC Fun Frenzy &copy; {new Date().getFullYear()}. All rights reserved
             </div>
         </footer>
     )
